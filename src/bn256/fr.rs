@@ -29,7 +29,10 @@ use crate::{
 use core::convert::TryInto;
 use core::fmt;
 use core::ops::{Add, Mul, Neg, Sub};
+#[cfg(feature = "hex")]
+use hex::encode;
 use rand::RngCore;
+use serde::{Serialize, Serializer};
 use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 
 /// This represents an element of $\mathbb{F}_r$ where
@@ -42,6 +45,17 @@ use subtle::{Choice, ConditionallySelectable, ConstantTimeEq, CtOption};
 // Montgomery form; i.e., Fr(a) = aR mod r, with R = 2^256.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Fr(pub(crate) [u64; 4]);
+
+#[cfg(feature = "hex")]
+impl Serialize  for Fr {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let bytes_hex = encode(self.to_bytes().to_vec());
+        serializer.serialize_str(bytes_hex.as_str())
+    }
+}
 
 #[cfg(feature = "derive_serde")]
 crate::serialize_deserialize_32_byte_primefield!(Fr);
