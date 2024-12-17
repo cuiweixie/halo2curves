@@ -52,7 +52,7 @@ impl Serialize  for Fr {
     where
         S: Serializer,
     {
-        let bytes_hex = encode(self.to_bytes().to_vec());
+        let bytes_hex = format!("{:?}", self);
         serializer.serialize_str(bytes_hex.as_str())
     }
 }
